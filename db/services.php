@@ -16,17 +16,17 @@
 /**
  * Web service local plugin template external functions and service definitions.
  *
- * @package    localwstemplate
+ * @package    localwarwickws
  * @copyright  2011 Jerome Mouneyrac
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 // We defined the web service functions to install.
 $functions = array(
-        'local_wstemplate_hello_world' => array(
-                'classname'   => 'local_wstemplate_external',
+        'local_warwickws_hello_world' => array(
+                'classname'   => 'local_warwickws_external',
                 'methodname'  => 'hello_world',
-                'classpath'   => 'local/wstemplate/externallib.php',
+                'classpath'   => 'local/warwickws/externallib.php',
                 'description' => 'Return Hello World FIRSTNAME. Can change the text (Hello World) sending a new text as parameter',
                 'type'        => 'read',
         )
@@ -35,7 +35,7 @@ $functions = array(
 // We define the services to install as pre-build services. A pre-build service is not editable by administrator.
 $services = array(
         'My service' => array(
-                'functions' => array ('local_wstemplate_hello_world'),
+                'functions' => array ('local_warwickws_hello_world'),
                 'restrictedusers' => 0,
                 'enabled'=>1,
         )

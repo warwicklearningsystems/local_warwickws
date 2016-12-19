@@ -16,13 +16,13 @@
 /**
  * External Web Service Template
  *
- * @package    localwstemplate
+ * @package    localwarwickws
  * @copyright  2011 Moodle Pty Ltd (http://moodle.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once($CFG->libdir . "/externallib.php");
 
-class local_wstemplate_external extends external_api {
+class local_warwickws_external extends external_api {
 
     /**
      * Returns description of method parameters

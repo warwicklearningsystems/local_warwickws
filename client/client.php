@@ -23,10 +23,10 @@
 
 /// SETUP - NEED TO BE CHANGED
 $token = 'dff3bc6a9368d3b0db1ef59f6760ef7c';
-$domainname = 'http://YOURMOODLE';
+$domainname = 'http://localhost';
 
 /// FUNCTION NAME
-$functionname = 'local_wstemplate_hello_world';
+$functionname = 'local_warwickws_hello_world';
 
 /// PARAMETERS
 $welcomemsg = 'Hello, ';
