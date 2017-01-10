@@ -23,11 +23,18 @@
 
 // We defined the web service functions to install.
 $functions = array(
-        'local_warwickws_hello_world' => array(
+       'warwick_check_cron_tasks' => array(
                 'classname'   => 'local_warwickws_external',
-                'methodname'  => 'hello_world',
+                'methodname'  => 'list_cron_tasks',
                 'classpath'   => 'local/warwickws/externallib.php',
-                'description' => 'Return Hello World FIRSTNAME. Can change the text (Hello World) sending a new text as parameter',
+                'description' => 'Retrieves a list of cron tasks.',
+                'type'        => 'read',
+        ),
+        'warwick_get_student_assignments' => array(
+                'classname'   => 'local_warwickws_external',
+                'methodname'  => 'get_student_assignment',
+                'classpath'   => 'local/warwickws/externallib.php',
+                'description' => 'Retrieves list of upcoming assignments for an individual student',
                 'type'        => 'read',
         )
 );
@@ -35,7 +42,7 @@ $functions = array(
 // We define the services to install as pre-build services. A pre-build service is not editable by administrator.
 $services = array(
         'My service' => array(
-                'functions' => array ('local_warwickws_hello_world'),
+                'functions' => array ('warwick_check_cron_tasks', 'warwick_get_student_assignments'),
                 'restrictedusers' => 0,
                 'enabled'=>1,
         )
