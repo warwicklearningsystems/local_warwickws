@@ -39,6 +39,7 @@ class local_warwickws_external extends external_api {
                     'name' => new external_value(PARAM_TEXT, 'Name of scheduled task'),
                     'timestamp' => new external_value(PARAM_TEXT, 'Timestamp of last run.'),
                     'disabled' => new external_value(PARAM_BOOL, 'Whether the task is disabled.'),
+                    'frequency' => new external_value(PARAM_TEXT, 'Frequency of scheduled task.')
                 )
             )
         );
@@ -73,6 +74,24 @@ class local_warwickws_external extends external_api {
             $g->name = $t->classname;
             $g->timestamp = $t->lastruntime;
             $g->disabled = $t->disabled;
+
+            // Calculate typical frequency
+            if($t->month != '*') {
+                $g->frequency = 'monthly';
+            } else if ($t->week != '*') {
+                $g->frequency = 'weekly';
+            } else {
+                $g->frequency = 'daily';
+            }
+            if($t->month != '*') {
+                $g->frequency = 'monthly';
+            } else if ($t->dayofweek != '*') {
+                $g->frequency = 'weekly';
+            } else {
+                $g->frequency = 'daily';
+            }
+
+
 
             $scheduledtasks[] = $g;
         }
@@ -138,6 +157,7 @@ class local_warwickws_external extends external_api {
 
             $a->name = $course->fullname;
             $a->idnumber = $course->idnumber;
+            $a->id = $course->id;
             $a->assignments = self::get_assignments_for_course($course->id);
 
             $assignments[] = $a;
