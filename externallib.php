@@ -203,4 +203,139 @@ class local_warwickws_external extends external_api {
         return $assignmentarray;
     }
 
+    /** Add blocks */
+
+    public static function course_add_block_parameters() {
+         return new external_function_parameters(
+           array(
+             'courseid' => new external_value(PARAM_INT, 'Course ID', VALUE_REQUIRED),
+             'blockname' => new external_value(PARAM_TEXT, 'Block name', VALUE_REQUIRED)
+           )
+         );
+    }
+
+    public static function course_add_block_returns() {
+        return new external_value(PARAM_BOOL, 'Success');
+    }
+
+    public static function course_add_block($courseid, $blockname) {
+        //global $PAGE;
+
+        //Parameter validation
+        //REQUIRED
+        $params = self::validate_parameters(self::course_add_block_parameters(),
+            array('courseid' => $courseid, 'blockname' => $blockname));
+
+        // Where are we going to put this block?
+        $course = get_course($params['courseid']);
+        $context = context_course::instance($course->id);
+
+        // Establish page within this course
+        $page = new moodle_page();
+        $page->set_context($context);
+        $page->set_pagelayout("course");
+        
+        // Add the block
+        $defaultregion = $page->blocks->get_default_region();
+
+        $page->blocks->add_block($blockname, $defaultregion, 1, FALSE, 'course-view-*');
+   }
+
+    /** Remove blocks */
+
+    public static function course_remove_block_parameters() {
+        return new external_function_parameters(
+            array(
+                'courseid' => new external_value(PARAM_INT, 'Course ID', VALUE_REQUIRED),
+                'blockid' => new external_value(PARAM_INT, 'Block instance ID', VALUE_REQUIRED)
+            )
+        );
+    }
+
+    public static function course_remove_block_returns() {
+        return new external_value(PARAM_BOOL, 'Success');
+    }
+
+    public static function course_remove_block($courseid, $blockid) {
+
+
+        global $OUTPUT, $PAGE;
+
+        //Parameter validation
+        //REQUIRED
+        $params = self::validate_parameters(self::course_remove_block_parameters(),
+            array('courseid' => $courseid, 'blockid' => $blockid));
+
+        // Where are we going to put this block?
+        $course = get_course($params['courseid']);
+        $context = context_course::instance($course->id);
+        self::validate_context($context);
+
+        $PAGE->set_pagelayout('course');
+        $course->format = course_get_format($course)->get_format();
+        $PAGE->set_pagetype('course-view-' . $course->format);
+
+        $PAGE->blocks->load_blocks();
+        $PAGE->blocks->create_all_block_instances();
+
+        $PAGE->set_course($course);
+        //$page->set_context($context);
+
+        //$page->blocks->create_all_block_instances();
+
+        // Find block
+        $block = $PAGE->blocks->find_instance($blockid);
+
+        // Remove the block
+        blocks_delete_instance($block->instance);
+    }
+
+
+   /** List blocks */
+
+   public static function course_list_blocks_parameters() {
+       return new external_function_parameters(
+           array(
+               'courseid' => new external_value(PARAM_INT, 'Course ID', VALUE_REQUIRED)
+           )
+       );
+   }
+
+    public static function course_list_blocks_returns() {
+        return new external_multiple_structure(
+            new external_single_structure(
+                array(
+                    'blockid' => new external_value(PARAM_INT, 'Block instance ID'),
+                    'name' => new external_value(PARAM_TEXT, 'Block name.')
+                )
+            )
+        );
+    }
+
+   public static function course_list_blocks($courseid) {
+       global $DB;
+
+       //Parameter validation
+       //REQUIRED
+       $params = self::validate_parameters(self::course_list_blocks_parameters(),
+           array('courseid' => $courseid));
+
+        // Where are we going to put this block?
+       $course = get_course($params['courseid']);
+       $context = context_course::instance($course->id);
+
+       $courseblocks = array();
+       $blocks = $DB->get_records('block_instances', array('parentcontextid' => $context->id));
+
+       foreach($blocks as $b) {
+           $g = new stdClass();
+           $g->blockid = $b->id;
+           $g->name = $b->blockname;
+
+           $courseblocks[] = $g;
+       }
+
+       return $courseblocks;
+    }
+
 }
