@@ -258,7 +258,6 @@ class local_warwickws_external extends external_api {
 
     public static function course_remove_block($courseid, $blockid) {
 
-
         global $OUTPUT, $PAGE;
 
         //Parameter validation
@@ -279,9 +278,9 @@ class local_warwickws_external extends external_api {
         $PAGE->blocks->create_all_block_instances();
 
         $PAGE->set_course($course);
-        //$page->set_context($context);
+        $PAGE->set_context($context);
 
-        //$page->blocks->create_all_block_instances();
+ //       $PAGE->blocks->create_all_block_instances();
 
         // Find block
         $block = $PAGE->blocks->find_instance($blockid);
