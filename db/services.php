@@ -36,14 +36,35 @@ $functions = array(
                 'classpath'   => 'local/warwickws/externallib.php',
                 'description' => 'Retrieves list of upcoming assignments for an individual student',
                 'type'        => 'read',
+        ),
+        'warwick_course_add_block' => array(
+                 'classname'   => 'local_warwickws_external',
+                 'methodname'  => 'course_add_block',
+                 'classpath'   => 'local/warwickws/externallib.php',
+                 'description' => 'Adds a block to a course',
+                 'type'        => 'write',
+        ),
+        'warwick_course_list_blocks' => array(
+                'classname'   => 'local_warwickws_external',
+                'methodname'  => 'course_list_blocks',
+                'classpath'   => 'local/warwickws/externallib.php',
+                'description' => 'Lists blocks in a course',
+                'type'        => 'read',
+        ),
+        'warwick_course_remove_block' => array(
+                'classname'   => 'local_warwickws_external',
+                'methodname'  => 'course_remove_block',
+                'classpath'   => 'local/warwickws/externallib.php',
+                'description' => 'Deletes an instance of a block in a course',
+                'type'        => 'write',
         )
 );
 
 // We define the services to install as pre-build services. A pre-build service is not editable by administrator.
-$services = array(
-        'My service' => array(
-                'functions' => array ('warwick_check_cron_tasks', 'warwick_get_student_assignments'),
-                'restrictedusers' => 0,
-                'enabled'=>1,
-        )
-);
+//$services = array(
+//        'My service' => array(
+//                'functions' => array ('warwick_check_cron_tasks', 'warwick_get_student_assignments', 'warwick_course_add_block'),
+//                'restrictedusers' => 0,
+//                'enabled'=>1,
+//        )
+//);
