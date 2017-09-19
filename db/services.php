@@ -23,14 +23,14 @@
 
 // We defined the web service functions to install.
 $functions = array(
-       'enrol_universityid' => array(
+       'warwick_enrol_student' => array(
                 'classname'   => 'local_warwickws_external',
-                'methodname'  => 'enrol_universityid',
+                'methodname'  => 'enrol_student',
                 'classpath'   => 'local/warwickws/externallib.php',
-                'description' => 'Allow enrolment via University ID.',
+                'description' => 'Allow student enrolment via University ID.',
                 'type'        => 'write',
         ),
-	   'warwick_check_cron_tasks' => array(
+	      'warwick_check_cron_tasks' => array(
                 'classname'   => 'local_warwickws_external',
                 'methodname'  => 'list_cron_tasks',
                 'classpath'   => 'local/warwickws/externallib.php',

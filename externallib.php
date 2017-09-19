@@ -27,7 +27,7 @@ class local_warwickws_external extends external_api {
 
 	/** Custom **/
 	
-	public static function enrol_universityid_parameters() {
+	public static function enrol_student_parameters() {
           return new external_function_parameters(
                 array(
                     'enrolments' => new external_multiple_structure(
@@ -45,13 +45,13 @@ class local_warwickws_external extends external_api {
         );
     }
 
-    public static function enrol_universityid_returns() {
+    public static function enrol_student_returns() {
         //return new external_value(PARAM_RAW, 'Description');
 		return null;
     }
 
 
-    public static function enrol_universityid($enrolments) {
+    public static function enrol_student($enrolments) {
         
 		global $DB, $CFG, $USER;
 
@@ -59,7 +59,7 @@ class local_warwickws_external extends external_api {
 		require_once($CFG->dirroot . "/user/lib.php");
 
         
-		$params = self::validate_parameters(self::enrol_universityid_parameters(),
+		$params = self::validate_parameters(self::enrol_student_parameters(),
                 array('enrolments' => $enrolments));
 
         $transaction = $DB->start_delegated_transaction(); // Rollback all enrolment if an error occurs
