@@ -46,153 +46,111 @@ class local_warwickws_external extends external_api {
     }
 
     public static function enrol_student_returns() {
-        //return new external_value(PARAM_RAW, 'Description');
-		return null;
+      return new external_value(PARAM_BOOL, 'Success');
     }
-
 
     public static function enrol_student($enrolments) {
         
-		global $DB, $CFG, $USER;
+		  global $DB, $CFG, $USER;
 
-        require_once($CFG->libdir . '/enrollib.php');
-		require_once($CFG->dirroot . "/user/lib.php");
+      require_once($CFG->libdir . '/enrollib.php');
+		  require_once($CFG->dirroot . "/user/lib.php");
 
-        
-		$params = self::validate_parameters(self::enrol_student_parameters(),
-                array('enrolments' => $enrolments));
+		  $params = self::validate_parameters(self::enrol_student_parameters(),
+                   array('enrolments' => $enrolments));
 
-        $transaction = $DB->start_delegated_transaction(); // Rollback all enrolment if an error occurs
+      $transaction = $DB->start_delegated_transaction(); // Rollback all enrolment if an error occurs
                                                            // (except if the DB doesn't support it).
 
-        // Retrieve the manual enrolment plugin.
-        $enrol = enrol_get_plugin('manual');
-        if (empty($enrol)) {
-            throw new moodle_exception('manualpluginnotinstalled', 'enrol_manual');
+      // Retrieve the manual enrolment plugin.
+      $enrol = enrol_get_plugin('manual');
+      if (empty($enrol)) {
+        throw new moodle_exception('manualpluginnotinstalled', 'enrol_manual');
+      }
+
+      // Loop through all the enrolments
+	   	foreach ($params['enrolments'] as $enrolment) {
+
+        // Find this course
+        $course = $DB->get_record('course', array('idnumber' => $enrolment['courseidnumber']));
+
+        if(empty($course)) {
+          $errorparams = new stdClass();
+          $errorparams->courseidnumber = $enrolment['courseidnumber'];
+          throw new moodle_exception('nocourse', 'local_warwickws', '', $errorparams);
         }
 
-		//Get Courseid from courseidnumber
-		
-			foreach ($params['enrolments'] as $enrolment){
-				$courses = $DB->get_records('course', array('idnumber' => $enrolment['courseidnumber']));
-				}
-			
-			if (empty($courses)) {
-							throw new moodle_exception('wscannotenrol', 'enrol_manual', '', $errorparams);
-						}
-			
-			//grab courseid as an int
-			$localcourseidnumber=(int)reset($courses)->id;
-			
-			
+		  	// Ensure the current user is allowed to run this function in the enrolment context.
+				$context = context_course::instance($course->id, IGNORE_MISSING);
+				self::validate_context($context);
 
-		//Error check params
-		
-					foreach ($params['enrolments'] as $enrolment) {
-						// Ensure the current user is allowed to run this function in the enrolment context.
-						$context = context_course::instance($localcourseidnumber, IGNORE_MISSING);
-						self::validate_context($context);
+				// Check that the user has the permission to manual enrol.
+			 	require_capability('enrol/manual:enrol', $context);
 
-						// Check that the user has the permission to manual enrol.
-						require_capability('enrol/manual:enrol', $context);
-
-						// Throw an exception if user is not able to assign the role.
-						$roles = get_assignable_roles($context);
-						
-						
-							$enrolname = 'manual';
-							$enrol = enrol_get_plugin($enrolname);
-							//$instance = null;
-				
-							$enrolinstances = enrol_get_instances(2, true);
-				
-							foreach ($enrolinstances as $courseenrolinstance) {
-								if ($courseenrolinstance->enrol == $enrolname) {
-									$instance = $courseenrolinstance;
-									break;
-								}
-							}
-							
-							if (empty($instance)) {
-							  $errorparams = new stdClass();
-							  $errorparams->courseidnumber = $enrolment['courseidnumber'];
-							  throw new moodle_exception('wsnoinstance', 'enrol_manual', $errorparams);
-							}
-						
-							
-							
-						
-						
-						//$context = context_system::instance();
-						//	self::validate_context($context);
-						
-						if (!array_key_exists(5, $roles)) {
-							$errorparams = new stdClass();
-							$errorparams->courseidnumber = $enrolment['courseidnumber'];
-							//$errorparams->userid = $enrolment['userid'];
-							$errorparams->universityid = $enrolment['universityid'];
-							//$errorparams->userid = 4;
-							
-							throw new moodle_exception('wsusercannotassign', 'enrol_manual', '', $errorparams);
-						}
-
-						
-						
-					  
-
-						// Check that the plugin accept enrolment (it should always the case, it's hard coded in the plugin).
-						if (!$enrol->allow_enrol($instance)) {
-							$errorparams = new stdClass();
-							$errorparams->roleid = 5;
-							$errorparams->courseidnumber = $enrolment['courseidnumber'];
-							$errorparams->universityid = $enrolment['universityid'];
-							//$errorparams->userid = 4;
-							throw new moodle_exception('wscannotenrol', 'enrol_manual', '', $errorparams);
-						}
-			
-			//Start working enrolment config
-			
-			// Get userid from universityid
-			$users = $DB->get_records_list('user', 'idnumber',array($enrolment['universityid']), 'id');
-				//check user returned
-				if (empty($users)) {
-							throw new moodle_exception('wscannotenrol', 'enrol_manual', '', $errorparams);
-						}
-			
-			//reset array to point ot start
-			reset($users);
-			//var_dump($users);
-			
-			
-			
-			
-			
-			//setup fresh enrol
 				$enrolname = 'manual';
 				$enrol = enrol_get_plugin($enrolname);
-				$instance = null;
-				
 
-				$enrolinstances = enrol_get_instances($localcourseidnumber, true);
-				
+        // Get enrolment instances for this course, and select the manual enrolment...
+				$enrolinstances = enrol_get_instances($course->id, true);
+
 				foreach ($enrolinstances as $courseenrolinstance) {
-					if ($courseenrolinstance->enrol == $enrolname) {
-						$instance = $courseenrolinstance;
+			  	if ($courseenrolinstance->enrol == $enrolname) {
+				  	$instance = $courseenrolinstance;
 						break;
 					}
-				} 
-				
+				}
+
+				// If we don't have an instance, throw an error...
+		  	if (empty($instance)) {
+			    $errorparams = new stdClass();
+				  $errorparams->courseid = $enrolment['courseidnumber'];
+          $errorparms->userid = $enrolment['universityid'];
+				  throw new moodle_exception('wsnoinstance', 'enrol_manual', $errorparams);
+				}
+
+        // Check that the plugin accept enrolment (it should always the case, it's hard coded in the plugin).
+        if (!$enrol->allow_enrol($instance)) {
+          $errorparams = new stdClass();
+          $errorparams->courseid = $enrolment['courseidnumber'];
+          throw new moodle_exception('wscannotenrol', 'enrol_manual', '', $errorparams);
+        }
+
+        //$context = context_system::instance();
+        //	self::validate_context($context);
+
+        // Throw an exception if user is not able to assign the role.
+        $roles = get_assignable_roles($context);
+
+        if (!array_key_exists(5, $roles)) {
+          $errorparams = new stdClass();
+          $errorparams->roleid = 'student';
+          $errorparams->courseid = $enrolment['courseidnumber'];
+          $errorparams->userid = $enrolment['universityid'];
+          throw new moodle_exception('wsusercannotassign', 'enrol_manual', '', $errorparams);
+        }
 			
-			//iterate array enrolling each id
-			foreach ($users as $item) {
-							$enrol->enrol_user($instance, $item->id, 5);
-							}
-			
-			// execute
-			$transaction->allow_commit();
-        
+        //Start working enrolment config
+        // Get userid from universityid
+        $users = $DB->get_records_list('user', 'idnumber',array($enrolment['universityid']), 'id');
+
+        //check user returned
+        if (empty($users)) {
+          $errorparams = new stdClass();
+          $errorparams->universityid = $enrolment['universityid'];
+          throw new moodle_exception('nouser', 'local_warwickws', '', $errorparams);
+        }
+
+        //iterate array enrolling each id
+        foreach ($users as $item) {
+          $enrol->enrol_user($instance, $item->id, 5);
+        }
+
+        // execute
+        $transaction->allow_commit();
+      }
+
+      return TRUE;
     }
-}
 
 
     /** Cron tasks */
