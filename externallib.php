@@ -170,11 +170,9 @@ class local_warwickws_external extends external_api {
 
   public static function reset_user_dashboard_returns() {
     return new external_single_structure(
-      new external_single_structure(
         array(
           'status' => new external_value(PARAM_BOOL, 'Success')
         )
-      )
     );
   }
 
