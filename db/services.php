@@ -64,6 +64,13 @@ $functions = array(
                 'classpath'   => 'local/warwickws/externallib.php',
                 'description' => 'Deletes an instance of a block in a course',
                 'type'        => 'write',
+        ),
+        'warwick_reset_dashboard' => array(
+                'classname'   => 'local_warwickws_external',
+                'methodname'  => 'reset_user_dashboard',
+                'classpath'   => 'local/warwickws/externallib.php',
+                'description' => 'Resets a users dashboard',
+                'type'        => 'write',
         )
 );
 

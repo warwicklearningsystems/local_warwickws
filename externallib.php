@@ -152,6 +152,58 @@ class local_warwickws_external extends external_api {
       return TRUE;
     }
 
+    /** Reset user dashboard */
+
+  public static function reset_user_dashboard_parameters() {
+    return new external_function_parameters(
+      array(
+       'users' => new external_multiple_structure(
+          new external_single_structure(
+            array(
+              'userid' => new external_value(PARAM_INT, 'User ID to reset dashboard.'),
+            )
+          )
+        )
+      )
+    );
+  }
+
+  public static function reset_user_dashboard_returns() {
+    return new external_single_structure(
+      new external_single_structure(
+        array(
+          'status' => new external_value(PARAM_BOOL, 'Success')
+        )
+      )
+    );
+  }
+
+  public static function reset_user_dashboard($users) {
+    global $USER, $DB;
+
+    //Parameter validation
+    //REQUIRED
+    $params = self::validate_parameters(self::reset_user_dashboard_parameters(),
+      array('users' => $users));
+
+    //Context validation
+    //OPTIONAL but in most web service it should present
+    $context = get_context_instance(CONTEXT_USER, $USER->id);
+    self::validate_context($context);
+
+    //Capability checking
+    //OPTIONAL but in most web service it should present
+    //if (!has_capability('moodle/user:viewdetails', $context)) {
+    //    throw new moodle_exception('cannotviewprofile');
+    //}
+
+    $users = $DB->get_records('user', $params['users']);
+
+    foreach($users as $u) {
+      my_reset_page($u);
+    }
+  }
+
 
     /** Cron tasks */
 
