@@ -21,6 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once($CFG->libdir . "/externallib.php");
+require_once($CFG->dirroot . "/my/lib.php");
 
 
 class local_warwickws_external extends external_api {
@@ -177,29 +178,29 @@ class local_warwickws_external extends external_api {
   }
 
   public static function reset_user_dashboard($users) {
-    global $USER, $DB;
+    global $DB;
+
+    $n = new stdClass;
+    $n->status = TRUE;
 
     //Parameter validation
     //REQUIRED
     $params = self::validate_parameters(self::reset_user_dashboard_parameters(),
       array('users' => $users));
 
-    //Context validation
-    //OPTIONAL but in most web service it should present
-    $context = get_context_instance(CONTEXT_USER, $USER->id);
-    self::validate_context($context);
-
     //Capability checking
     //OPTIONAL but in most web service it should present
     //if (!has_capability('moodle/user:viewdetails', $context)) {
     //    throw new moodle_exception('cannotviewprofile');
     //}
+    foreach($params['users'] as $user) {
 
-    $users = $DB->get_records('user', $params['users']);
+      $u = $DB->get_record('user', array('id' => $user['userid']));
 
-    foreach($users as $u) {
-      my_reset_page($u);
+      my_reset_page($u->id);
     }
+
+    return $n;
   }
 
 
