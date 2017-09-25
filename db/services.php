@@ -71,14 +71,14 @@ $functions = array(
                 'classpath'   => 'local/warwickws/externallib.php',
                 'description' => 'Resets a users dashboard',
                 'type'        => 'write',
+        ),
+        'warwick_add_enrolment_method' => array(
+                'classname'   => 'local_warwickws_external',
+                'methodname'  => 'add_enrolment_method',
+                'classpath'   => 'local/warwickws/externallib.php',
+                'description' => 'Adds an enrolment method to a course',
+                'type'        => 'write',
         )
+
 );
 
-// We define the services to install as pre-build services. A pre-build service is not editable by administrator.
-//$services = array(
-//        'My service' => array(
-//                'functions' => array ('warwick_check_cron_tasks', 'warwick_get_student_assignments', 'warwick_course_add_block'),
-//                'restrictedusers' => 0,
-//                'enabled'=>1,
-//        )
-//);

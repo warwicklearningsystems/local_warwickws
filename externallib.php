@@ -153,7 +153,7 @@ class local_warwickws_external extends external_api {
       return TRUE;
     }
 
-    /** Reset user dashboard */
+  /** Reset user dashboard */
 
   public static function reset_user_dashboard_parameters() {
     return new external_function_parameters(
@@ -203,6 +203,63 @@ class local_warwickws_external extends external_api {
     return $n;
   }
 
+  /** Add enrolment method */
+
+  public static function add_enrolment_method_parameters() {
+    return new external_function_parameters(
+          array(
+            'courseid' => new external_value(PARAM_INT, "Course ID"),
+            'methodname' => new external_value(PARAM_ALPHANUM, 'Method name')
+          )
+
+      );
+  }
+
+  public static function add_enrolment_method_returns() {
+    return new external_single_structure(
+      array(
+        'status' => new external_value(PARAM_BOOL, 'Success')
+      )
+    );
+  }
+
+  public static function add_enrolment_method($courseid, $methodname)
+  {
+    global $DB;
+
+    $n = new stdClass();
+    $n->status = TRUE;
+
+    $params = self::validate_parameters(self::add_enrolment_method_parameters(),
+      array('courseid' => $courseid, 'methodname' => $methodname));
+
+    // Find the course
+    $course = get_course($params['courseid']);
+
+    // Find the plugin
+    $plugin = enrol_get_plugin($params['methodname']);
+
+    // If both course and plugin are valid, then let's add the default
+    // instance of this enrolment method
+    if($plugin && $course) {
+      $instanceid = $plugin->add_default_instance($course);
+
+      // If we managed to add an instance, let's enable it
+      if( $instanceid ) {
+        $instance = $DB->get_record('enrol', array('id' => $instanceid));
+        if ( $instance ) {
+          $plugin->update_status($instance, ENROL_INSTANCE_ENABLED);
+        } else {
+          $n->status = FALSE;
+        }
+      }
+
+    } else {
+      $n->status = FALSE;
+    }
+
+    return $n;
+  }
 
     /** Cron tasks */
 
@@ -270,8 +327,6 @@ class local_warwickws_external extends external_api {
             } else {
                 $g->frequency = 'daily';
             }
-
-
 
             $scheduledtasks[] = $g;
         }
