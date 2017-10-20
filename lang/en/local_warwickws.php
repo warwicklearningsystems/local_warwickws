@@ -23,3 +23,9 @@
  */
 
 $string['pluginname'] = 'Warwick Web Services';
+
+// Error messages
+$string['nocourse'] = 'Course {$a->courseidnumber} cannot be found.';
+$string['nouser'] = 'User with ID {$a->universityid} cannot be found.';
+$string['wsevent'] = 'Skillsforge Webservice was passed invalid data';
+
