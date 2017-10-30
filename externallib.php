@@ -22,7 +22,7 @@
  */
 require_once($CFG->libdir . "/externallib.php");
 require_once($CFG->dirroot . "/my/lib.php");
-require_once("$CFG->libdir/completionlib.php");
+require_once($CFG->libdir . "/completionlib.php");
 require_once($CFG->libdir . '/grouplib.php');
 		require_once($CFG->libdir . '/enrollib.php');
 		require_once($CFG->dirroot . "/user/lib.php");

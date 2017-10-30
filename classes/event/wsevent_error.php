@@ -24,8 +24,11 @@
 namespace local_warwickws\event;
 defined('MOODLE_INTERNAL') || die();
 
+//echo ($CFG->dirroot . "/config.php");
+
+//require_once($CFG->dirroot . "/config.php");
 //require_once(__DIR__ . '/../../config.php');
-require_once('/var/www/html/config.php');
+//require_once('/var/www/html/config.php');
 
 /**
  * The EVENTNAME event class.
