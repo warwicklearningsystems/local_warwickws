@@ -22,6 +22,7 @@
  */
 require_once($CFG->libdir . "/externallib.php");
 require_once($CFG->dirroot . "/my/lib.php");
+
 require_once($CFG->libdir . "/completionlib.php");
 require_once($CFG->libdir . '/grouplib.php');
 		require_once($CFG->libdir . '/enrollib.php');
@@ -32,6 +33,7 @@ class local_warwickws_external extends external_api {
 
 	/** Custom **/
 	
+
 	/** Return Course completion status **/
 	public static function binary_get_course_completion_status_parameters() {
           return new external_function_parameters(
@@ -147,6 +149,7 @@ class local_warwickws_external extends external_api {
 	
 	
 	/** Custom Enrol plugin **/
+
 	public static function enrol_student_parameters() {
           return new external_function_parameters(
                 array(
@@ -175,6 +178,7 @@ class local_warwickws_external extends external_api {
 
       require_once($CFG->libdir . '/enrollib.php');
 		  require_once($CFG->dirroot . "/user/lib.php");
+
 
 		
 		  $params = self::validate_parameters(self::enrol_student_parameters(),
@@ -373,6 +377,39 @@ class local_warwickws_external extends external_api {
 				// Check that the user has the permission to manual enrol.
 			 	require_capability('enrol/manual:unenrol', $context);
 
+
+		  $params = self::validate_parameters(self::enrol_student_parameters(),
+                   array('enrolments' => $enrolments));
+
+      $transaction = $DB->start_delegated_transaction(); // Rollback all enrolment if an error occurs
+                                                           // (except if the DB doesn't support it).
+
+      // Retrieve the manual enrolment plugin.
+      $enrol = enrol_get_plugin('manual');
+      if (empty($enrol)) {
+        throw new moodle_exception('manualpluginnotinstalled', 'enrol_manual');
+      }
+
+      // Loop through all the enrolments
+	   	foreach ($params['enrolments'] as $enrolment) {
+
+        // Find this course
+        $course = $DB->get_record('course', array('idnumber' => $enrolment['courseidnumber']));
+
+        if(empty($course)) {
+          $errorparams = new stdClass();
+          $errorparams->courseidnumber = $enrolment['courseidnumber'];
+          throw new moodle_exception('nocourse', 'local_warwickws', '', $errorparams);
+        }
+
+		  	// Ensure the current user is allowed to run this function in the enrolment context.
+				$context = context_course::instance($course->id, IGNORE_MISSING);
+				self::validate_context($context);
+
+				// Check that the user has the permission to manual enrol.
+			 	require_capability('enrol/manual:enrol', $context);
+
+
 				$enrolname = 'manual';
 				$enrol = enrol_get_plugin($enrolname);
 
@@ -423,6 +460,7 @@ class local_warwickws_external extends external_api {
         if (empty($users)) {
           $errorparams = new stdClass();
           $errorparams->universityid = $enrolment['universityid'];
+
            $context = context_system::instance();
 					  
 					  //Write event to log
@@ -528,6 +566,70 @@ class local_warwickws_external extends external_api {
 
       my_reset_page($u->id);
     }
+
+
+          throw new moodle_exception('nouser', 'local_warwickws', '', $errorparams);
+        }
+
+        //iterate array enrolling each id
+        foreach ($users as $item) {
+          $enrol->enrol_user($instance, $item->id, 5);
+        }
+
+        // execute
+        $transaction->allow_commit();
+      }
+
+      return TRUE;
+    }
+
+  /** Reset user dashboard */
+
+  public static function reset_user_dashboard_parameters() {
+    return new external_function_parameters(
+      array(
+       'users' => new external_multiple_structure(
+          new external_single_structure(
+            array(
+              'userid' => new external_value(PARAM_INT, 'User ID to reset dashboard.'),
+            )
+          )
+        )
+      )
+    );
+  }
+
+  public static function reset_user_dashboard_returns() {
+    return new external_single_structure(
+        array(
+          'status' => new external_value(PARAM_BOOL, 'Success')
+        )
+    );
+  }
+
+  public static function reset_user_dashboard($users) {
+    global $DB;
+
+    $n = new stdClass;
+    $n->status = TRUE;
+
+    //Parameter validation
+    //REQUIRED
+    $params = self::validate_parameters(self::reset_user_dashboard_parameters(),
+      array('users' => $users));
+
+    //Capability checking
+    //OPTIONAL but in most web service it should present
+    //if (!has_capability('moodle/user:viewdetails', $context)) {
+    //    throw new moodle_exception('cannotviewprofile');
+    //}
+    foreach($params['users'] as $user) {
+
+      $u = $DB->get_record('user', array('id' => $user['userid']));
+
+      my_reset_page($u->id);
+    }
+
 
     return $n;
   }

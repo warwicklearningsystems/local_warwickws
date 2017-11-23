@@ -24,6 +24,7 @@
 // We defined the web service functions to install.
 $functions = array(
 
+
         'warwick_binary_get_course_completion_status' => array(
                 'classname'   => 'local_warwickws_external',
                 'methodname'  => 'binary_get_course_completion_status',
@@ -39,6 +40,7 @@ $functions = array(
                 'type'        => 'write',
         ),
 	   'warwick_enrol_student' => array(
+
                 'classname'   => 'local_warwickws_external',
                 'methodname'  => 'enrol_student',
                 'classpath'   => 'local/warwickws/externallib.php',
