@@ -34,7 +34,7 @@ $functions = array(
         ),
 		'warwick_unenrol_student' => array(
                 'classname'   => 'local_warwickws_external',
-                'methodname'  => 'unenrol_student',
+                'methodname'  => 'warwick_unenrol_student',
                 'classpath'   => 'local/warwickws/externallib.php',
                 'description' => 'Allow student UNenrolment via University ID.',
                 'type'        => 'write',
@@ -42,12 +42,12 @@ $functions = array(
 	   'warwick_enrol_student' => array(
 
                 'classname'   => 'local_warwickws_external',
-                'methodname'  => 'enrol_student',
+                'methodname'  => 'warwick_enrol_student',
                 'classpath'   => 'local/warwickws/externallib.php',
                 'description' => 'Allow student enrolment via University ID.',
                 'type'        => 'write',
         ),
-	      'warwick_check_cron_tasks' => array(
+	    'warwick_check_cron_tasks' => array(
                 'classname'   => 'local_warwickws_external',
                 'methodname'  => 'list_cron_tasks',
                 'classpath'   => 'local/warwickws/externallib.php',
