@@ -32,9 +32,141 @@ require_once($CFG->dirroot . "/user/lib.php");
 class local_warwickws_external extends external_api {
 
 	/** Custom **/
+	/** Return Course completion status **/
+	
+	public static function timestamp_get_course_completion_status_parameters() {
+          return new external_function_parameters(
+                array(
+                                        'courseidnumber' => new external_value(PARAM_RAW, 'The WARWICK COURSE ID to enrol the user role in'),
+										'timestamp' => new external_value(PARAM_RAW, VALUE_OPTIONAL, 'Optional unix timestamp')
+                                    )
+                            );
+        
+    }
+
+	/*
+    public static function timestamp_get_course_completion_status_returns() {
+      //return new external_value(PARAM_BOOL, 'Success');
+	  return new external_value(PARAM_RAW, 'Users'); 
+    }
+	*/
+
+	
+	public static function timestamp_get_course_completion_status_returns() {
+        return new external_multiple_structure(
+            new external_single_structure(
+                array(
+                    'userid' => new external_value(PARAM_INT, 'userid'),
+                    'timecompleted' => new external_value(PARAM_INT, 'timecompleted'),
+                    'idnumber' => new external_value(PARAM_RAW, 'idnumber'),
+                )
+            ), 'list of completions'
+        );
+    }
+	
+    public static function timestamp_get_course_completion_status($courseidnumber, $timestamp) {
+        
+		global $DB, $CFG, $USER;
+		
+
+		// Add back in parameter checking later!
+		
+		  //$params = self::validate_parameters(self::timestamp_get_course_completion_status(),
+           //        array('completionchecks' => $completionchecks)); 
+
+     
+      /*
+	  $enrol = enrol_get_plugin('manual');
+      if (empty($completionchecks)) {
+        throw new moodle_exception('manualpluginnotinstalled', 'enrol_manual');
+      }
+	*/
+	
+	//echo "Courseidnumber:".$courseidnumber;
+	//echo "Timestamp:".$timestamp;
+	//print_r($timestamp);
+	
+	$courseuid=$courseidnumber;
+	$inttimestamp=(int)$timestamp;
+	
+	// If param not set, set timestamp to 0 (1/1/1970). **Actually not required as defaults to 0 if not set anyway.
+	/*
+			if (!isset($completionchecks[0]['timestamp'])) 
+				{
+					echo "Not set";
+					$inttimestamp=0;}
+			else{
+					echo "Set";
+					$inttimestamp=(int)$completionchecks[0]['timestamp'];
+			}
+		*/	
+			
+	//print_r($inttimestamp);
+	
+    // Loop through all the enrolments
+	   	//foreach ($params['completionchecks'] as $enrolment) {
+					
+					
+					//echo "In loop";
+					// Find this course
+					$course = $DB->get_record('course', array('idnumber' => $courseuid));
+					
+					$courseidint=(int)$course->id;
+					//print_r($course);
+					//echo "Courseiding : ".$courseidint;
+					
+					
+					if(empty($course)) {
+					  $errorparams = new stdClass();
+					  $errorparams->courseidnumber = $enrolment['courseidnumber'];
+					  $context = context_system::instance();
+					  
+							//Write event to log
+							$event =\local_warwickws\event\wsevent_error::create(array(
+								'context'=>$context,
+								'other'=>'Course: '.$enrolment['courseidnumber']
+									));
+							$event->trigger();
+					  
+					  throw new moodle_exception('nocourse', 'local_warwickws', '', $errorparams);
+					}
+		
+		
+
+											
+					// Get userid from universityid
+					//$users = $DB->get_records_list('user', 'idnumber',array($enrolment['universityid']), 'id');
+					
+					//echo "Course is: ".$course;
+					//print_r($course);
+					//$sql='select userid, timecompleted from mdl_course_completions where course='.$courseidint.' and timecompleted>='.$inttimestamp;
+					$sql='select mdl_course_completions.userid, mdl_course_completions.timecompleted, mdl_user.idnumber from mdl_course_completions inner join mdl_user on mdl_course_completions.userid=mdl_user.id
+ where course='.$courseidint.' and timecompleted>='.$inttimestamp;
+
+						
+						//echo $sql;
+						$p=$DB->get_records_sql($sql);
+						//print_r($p);
+
+						//return $info->is_course_complete($user->id);
+						//return json_encode((array)$p);
+						return $p;
+									
+      
+	}       
+    
 	
 
+	
+	//
+	// Binary return
+	//
+	
+	
 	/** Return Course completion status **/
+	
+	
+	
 	public static function binary_get_course_completion_status_parameters() {
           return new external_function_parameters(
                 array(
@@ -50,6 +182,11 @@ class local_warwickws_external extends external_api {
         );
     }
 
+	
+	
+	
+	
+	
     public static function binary_get_course_completion_status_returns() {
       return new external_value(PARAM_BOOL, 'Success');
 	  //return new external_value(PARAM_RAW, 'Success'); 

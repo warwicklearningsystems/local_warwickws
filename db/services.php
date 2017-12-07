@@ -24,7 +24,13 @@
 // We defined the web service functions to install.
 $functions = array(
 
-
+		'warwick_timestamp_get_course_completion_status' => array(
+                'classname'   => 'local_warwickws_external',
+                'methodname'  => 'timestamp_get_course_completion_status',
+                'classpath'   => 'local/warwickws/externallib.php',
+                'description' => 'Return array of completion statuses after timestamp.',
+                'type'        => 'read',
+        ),
         'warwick_binary_get_course_completion_status' => array(
                 'classname'   => 'local_warwickws_external',
                 'methodname'  => 'binary_get_course_completion_status',
