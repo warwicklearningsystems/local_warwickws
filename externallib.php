@@ -37,7 +37,7 @@ class local_warwickws_external extends external_api {
 	public static function timestamp_get_course_completion_status_parameters() {
           return new external_function_parameters(
                 array(
-                                        'courseidnumber' => new external_value(PARAM_RAW, 'The WARWICK COURSE ID to enrol the user role in'),
+                                        'courseidnumber' => new external_value(PARAM_RAW, 'The WARWICK COURSE ID to verify completion for'),
 										'timestamp' => new external_value(PARAM_RAW, VALUE_OPTIONAL, 'Optional unix timestamp')
                                     )
                             );
