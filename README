@@ -1,10 +1,16 @@
-Warwick Web Services for Moodle
-------------------------------------------
+## Warwick Web Services for Moodle
 
 Web services specific for Warwick's Moodle.
 
-
-Getting started
+### Getting started
 
 1. Install the plugin in moodle/local/warwickws/
 2. Read, setup and run moodle/local/warwickws/client/client.php
+
+### Web service functions
+
+* warwick_reset_dashboard - Resets a user's dashboard to the default state.
+* warwick_add_enrolment_method - Adds an enrolment into a course.
+* warwick_course_list_blocks - Lists blocks in a course
+* warwick_course_add_block - Adds block in a course
+* warwick_course_remove_block - Removes blocks in a course

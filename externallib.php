@@ -1,24 +1,10 @@
 <?php
 
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
- * External Web Service Template
+ * External Web Services
  *
  * @package    localwarwickws
- * @copyright  2011 Moodle Pty Ltd (http://moodle.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2019 University of Warwick
  */
 require_once($CFG->libdir . "/externallib.php");
 require_once($CFG->dirroot . "/my/lib.php");
@@ -34,25 +20,17 @@ class local_warwickws_external extends external_api {
 	/** Custom **/
 	/** Return Course completion status **/
 	
-	public static function timestamp_get_course_completion_status_parameters() {
-          return new external_function_parameters(
-                array(
-                                        'courseidnumber' => new external_value(PARAM_RAW, 'The WARWICK COURSE ID to verify completion for'),
-										'timestamp' => new external_value(PARAM_RAW, VALUE_OPTIONAL, 'Optional unix timestamp')
-                                    )
-                            );
-        
+    public static function timestamp_get_course_completion_status_parameters() {
+      return new external_function_parameters(
+        array(
+          'courseidnumber' => new external_value(PARAM_RAW, 'The WARWICK COURSE ID to verify completion for'),
+          'timestamp' => new external_value(PARAM_RAW, VALUE_OPTIONAL, 'Optional unix timestamp')
+        )
+      );
+
     }
 
-	/*
-    public static function timestamp_get_course_completion_status_returns() {
-      //return new external_value(PARAM_BOOL, 'Success');
-	  return new external_value(PARAM_RAW, 'Users'); 
-    }
-	*/
-
-	
-	public static function timestamp_get_course_completion_status_returns() {
+  	public static function timestamp_get_course_completion_status_returns() {
         return new external_multiple_structure(
             new external_single_structure(
                 array(
@@ -68,26 +46,12 @@ class local_warwickws_external extends external_api {
         
 		global $DB, $CFG, $USER;
 		
-
-		// Add back in parameter checking later!
-		
-		  //$params = self::validate_parameters(self::timestamp_get_course_completion_status(),
-           //        array('completionchecks' => $completionchecks)); 
+    $params = self::validate_parameters(self::timestamp_get_course_completion_status_parameters(),
+                   array('courseidnumber' => $courseidnumber, 'timestamp' => $timestamp));
 
      
-      /*
-	  $enrol = enrol_get_plugin('manual');
-      if (empty($completionchecks)) {
-        throw new moodle_exception('manualpluginnotinstalled', 'enrol_manual');
-      }
-	*/
-	
-	//echo "Courseidnumber:".$courseidnumber;
-	//echo "Timestamp:".$timestamp;
-	//print_r($timestamp);
-	
-	$courseuid=$courseidnumber;
-	$inttimestamp=(int)$timestamp;
+    courseuid=$courseidnumber;
+	  $inttimestamp=(int)$timestamp;
 	
 	// If param not set, set timestamp to 0 (1/1/1970). **Actually not required as defaults to 0 if not set anyway.
 	/*
@@ -101,8 +65,7 @@ class local_warwickws_external extends external_api {
 			}
 		*/	
 			
-	//print_r($inttimestamp);
-	
+
     // Loop through all the enrolments
 	   	//foreach ($params['completionchecks'] as $enrolment) {
 					
@@ -961,6 +924,70 @@ class local_warwickws_external extends external_api {
 
         return $assignmentarray;
     }
+
+    /** Get courses */
+
+  public static function get_list_courses_parameters() {
+    return new external_function_parameters(
+      array('idnumber' => new external_value(PARAM_TEXT, 'University ID number', VALUE_REQUIRED))
+    );
+  }
+
+  public static function get_list_courses_returns() {
+    return new external_multiple_structure(
+      new external_single_structure(
+        array(
+          'id' => new external_value(PARAM_TEXT, 'ID course'),
+          'fullname' => new external_value(PARAM_TEXT, 'Full name of course'),
+          'shortname' => new external_value(PARAM_TEXT, 'Short name of course'),
+          'idnumber' => new external_value(PARAM_TEXT, 'ID number of course'),
+          'summary' => new external_value(PARAM_TEXT, 'Summary of the course'),
+          'startdate' => new external_value(PARAM_TEXT, 'Start date'),
+          'enddate' => new external_value(PARAM_TEXT, 'End date'),
+
+        )
+      )
+    );
+
+  }
+
+  public static function get_list_courses($idnumber) {
+    global $USER, $DB;
+
+    //Parameter validation
+    //REQUIRED
+    $params = self::validate_parameters(self::get_list_courses_parameters(),
+      array('idnumber' => $idnumber));
+
+    //Context validation
+    //OPTIONAL but in most web service it should present
+    $context = get_context_instance(CONTEXT_USER, $USER->id);
+    self::validate_context($context);
+
+    //Capability checking
+    //OPTIONAL but in most web service it should present
+    //if (!has_capability('moodle/user:viewdetails', $context)) {
+    //    throw new moodle_exception('cannotviewprofile');
+    //}
+
+    $assignments = array();
+
+    $fields = 'sortorder,shortname,fullname,timemodified';
+    $courses = enrol_get_users_courses($USER->id, true, $fields);
+
+    foreach($courses as $id => $course) {
+      $a = new stdClass();
+
+      $a->name = $course->fullname;
+      $a->idnumber = $course->idnumber;
+      $a->id = $course->id;
+      $a->assignments = self::get_assignments_for_course($course->id);
+
+      $assignments[] = $a;
+    }
+
+    return $assignments;
+  }
 
     /** Add blocks */
 

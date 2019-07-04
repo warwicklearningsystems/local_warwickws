@@ -14,11 +14,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Web service local plugin template external functions and service definitions.
+ * Web services definition
  *
  * @package    localwarwickws
- * @copyright  2011 Jerome Mouneyrac
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2019 University of Warwick
  */
 
 // We defined the web service functions to install.
@@ -31,7 +30,7 @@ $functions = array(
                 'description' => 'Return array of completion statuses after timestamp.',
                 'type'        => 'read',
         ),
-        'warwick_binary_get_course_completion_status' => array(
+    'warwick_binary_get_course_completion_status' => array(
                 'classname'   => 'local_warwickws_external',
                 'methodname'  => 'binary_get_course_completion_status',
                 'classpath'   => 'local/warwickws/externallib.php',
@@ -65,6 +64,13 @@ $functions = array(
                 'methodname'  => 'get_student_assignment',
                 'classpath'   => 'local/warwickws/externallib.php',
                 'description' => 'Retrieves list of upcoming assignments for an individual student',
+                'type'        => 'read',
+        ),
+        'warwick_get_list_courses' => array(
+                'classname'   => 'local_warwickws_external',
+                'methodname'  => 'get_list_courses',
+                'classpath'   => 'local/warwickws/externallib.php',
+                'description' => 'Retrieves list of courses for a user',
                 'type'        => 'read',
         ),
         'warwick_course_add_block' => array(
