@@ -50,7 +50,7 @@ class local_warwickws_external extends external_api {
                    array('courseidnumber' => $courseidnumber, 'timestamp' => $timestamp));
 
      
-    courseuid=$courseidnumber;
+    $courseuid=$courseidnumber;
 	  $inttimestamp=(int)$timestamp;
 	
 	// If param not set, set timestamp to 0 (1/1/1970). **Actually not required as defaults to 0 if not set anyway.
