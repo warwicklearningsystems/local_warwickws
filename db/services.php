@@ -107,7 +107,35 @@ $functions = array(
                 'classpath'   => 'local/warwickws/externallib.php',
                 'description' => 'Adds an enrolment method to a course',
                 'type'        => 'write',
-        )
+        ),
+        'warwick_freeze_course' => array(
+          'classname'   => 'local_warwickws_external',
+          'methodname'  => 'freeze_course',
+          'classpath'   => 'local/warwickws/externallib.php',
+          'description' => 'Freezes a course',
+          'type'        => 'write',
+        ),
+        'warwick_unfreeze_course' => array(
+          'classname'   => 'local_warwickws_external',
+          'methodname'  => 'unfreeze_course',
+          'classpath'   => 'local/warwickws/externallib.php',
+          'description' => 'Unfreezes a course',
+          'type'        => 'write',
+        ),
+        'warwick_freeze_category' => array(
+          'classname'   => 'local_warwickws_external',
+          'methodname'  => 'freeze_category',
+          'classpath'   => 'local/warwickws/externallib.php',
+          'description' => 'Freezes an entire category',
+          'type'        => 'write',
+        ),
+        'warwick_unfreeze_category' => array(
+          'classname'   => 'local_warwickws_external',
+          'methodname'  => 'unfreeze_category',
+          'classpath'   => 'local/warwickws/externallib.php',
+          'description' => 'Unfreezes an entire category',
+          'type'        => 'write',
+        ),
 
 );
 
