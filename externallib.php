@@ -1123,4 +1123,181 @@ class local_warwickws_external extends external_api {
        return $courseblocks;
     }
 
+    // Context freezing
+
+    // Courses
+
+    public static function freeze_course_parameters() {
+      return new external_function_parameters(
+        array(
+          'courseid' => new external_value(PARAM_INT, 'Course ID', VALUE_REQUIRED)
+        )
+      );
+    }
+
+    public static function freeze_course_returns() {
+      return new external_single_structure(
+        array(
+          'status' => new external_value(PARAM_BOOL, 'Success')
+        )
+      );
+    }
+
+    public static function freeze_course($courseid) {
+      global $DB;
+
+      $n = new stdClass();
+      $n->status = FALSE;
+
+      // Parameter validation - check courseid
+      $params = self::validate_parameters(self::freeze_course_parameters(),
+        array('courseid' => $courseid));
+
+      // Which context are we going to freeze?
+      $course = get_course($params['courseid']);
+      $context = context_course::instance($course->id);
+
+      // Lock this course context
+      $context->set_locked(TRUE);
+
+      // If context is now locked, return true
+      if ($context->locked) {
+        $n->status = TRUE;
+      }
+
+      return $n;
+    }
+
+    public static function unfreeze_course_parameters() {
+      return new external_function_parameters(
+        array(
+          'courseid' => new external_value(PARAM_INT, 'Course ID', VALUE_REQUIRED)
+        )
+      );
+    }
+
+    public static function unfreeze_course_returns() {
+      return new external_single_structure(
+        array(
+          'status' => new external_value(PARAM_BOOL, 'Success')
+        )
+      );
+    }
+
+    public static function unfreeze_course($courseid) {
+      global $DB;
+
+      $n = new stdClass();
+      $n->status = FALSE;
+
+      // Parameter validation - check courseid
+      $params = self::validate_parameters(self::unfreeze_course_parameters(),
+        array('courseid' => $courseid));
+
+      // Which context are we going to freeze?
+      $course = get_course($params['courseid']);
+      $context = context_course::instance($course->id);
+
+      // Lock this course context
+      $context->set_locked(FALSE);
+
+      // If context is now unlocked, return true
+      if (!$context->locked) {
+        $n->status = TRUE;
+      }
+
+      return $n;
+    }
+
+    // Categories
+    public static function freeze_category_parameters() {
+      return new external_function_parameters(
+        array(
+          'categoryid' => new external_value(PARAM_INT, 'Category ID', VALUE_REQUIRED)
+        )
+      );
+    }
+
+    public static function freeze_category_returns() {
+      return new external_single_structure(
+        array(
+          'status' => new external_value(PARAM_BOOL, 'Success')
+        )
+      );
+    }
+
+    public static function freeze_category($categoryid) {
+      global $DB;
+
+      $n = new stdClass();
+      $n->status = FALSE;
+
+      // Parameter validation - check courseid
+      $params = self::validate_parameters(self::freeze_category_parameters(),
+        array('categoryid' => $categoryid));
+
+      // Which context are we going to freeze?
+      $category = get_category_or_system_context($params['categoryid']);
+
+      // If we've found the SITE context, do NOT proceed
+      if($category != 0) {
+        $context = context_coursecat::instance($category->id);
+
+        // Lock this category context
+        $context->set_locked(TRUE);
+
+        // If context is now locked, return true
+        if ($context->locked) {
+          $n->status = TRUE;
+        }
+      }
+
+      return $n;
+    }
+
+    public static function unfreeze_category_parameters() {
+      return new external_function_parameters(
+        array(
+          'categoryid' => new external_value(PARAM_INT, 'Category ID', VALUE_REQUIRED)
+        )
+      );
+    }
+
+    public static function unfreeze_category_returns() {
+      return new external_single_structure(
+        array(
+          'status' => new external_value(PARAM_BOOL, 'Success')
+        )
+      );
+    }
+
+    public static function unfreeze_category($categoryid) {
+      global $DB;
+
+      $n = new stdClass();
+      $n->status = FALSE;
+
+      // Parameter validation - check courseid
+      $params = self::validate_parameters(self::freeze_category_parameters(),
+        array('categoryid' => $categoryid));
+
+      // Which context are we going to freeze?
+      $category = get_category_or_system_context($params['categoryid']);
+
+      // If we've found the SITE context, do NOT proceed
+      if($category != 0) {
+        $context = context_coursecat::instance($category->id);
+
+        // Lock this category context
+        $context->set_locked(TRUE);
+
+        // If context is now locked, return true
+        if ($context->locked) {
+          $n->status = TRUE;
+        }
+      }
+
+      return $n;
+    }
+
 }
