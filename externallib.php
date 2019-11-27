@@ -13,7 +13,8 @@ require_once($CFG->libdir . "/completionlib.php");
 require_once($CFG->libdir . '/grouplib.php');
 require_once($CFG->libdir . '/enrollib.php');
 require_once($CFG->dirroot . "/user/lib.php");
-		
+require_once($CFG->dirroot . "/course/lib.php");
+
 		
 class local_warwickws_external extends external_api {
 
@@ -1240,8 +1241,8 @@ class local_warwickws_external extends external_api {
       $category = get_category_or_system_context($params['categoryid']);
 
       // If we've found the SITE context, do NOT proceed
-      if($category != 0) {
-        $context = context_coursecat::instance($category->id);
+      if($categoryid != 0 || $category->instanceid != 0) {
+        $context = context_coursecat::instance($category->instanceid);
 
         // Lock this category context
         $context->set_locked(TRUE);
@@ -1285,8 +1286,8 @@ class local_warwickws_external extends external_api {
       $category = get_category_or_system_context($params['categoryid']);
 
       // If we've found the SITE context, do NOT proceed
-      if($category != 0) {
-        $context = context_coursecat::instance($category->id);
+      if($categoryid != 0 || $category->instanceid != 0) {
+        $context = context_coursecat::instance($category->instanceid);
 
         // Lock this category context
         $context->set_locked(TRUE);
