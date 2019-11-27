@@ -1290,10 +1290,10 @@ class local_warwickws_external extends external_api {
         $context = context_coursecat::instance($category->instanceid);
 
         // Lock this category context
-        $context->set_locked(TRUE);
+        $context->set_locked(FALSE);
 
         // If context is now locked, return true
-        if ($context->locked) {
+        if (!$context->locked) {
           $n->status = TRUE;
         }
       }
