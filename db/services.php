@@ -136,6 +136,13 @@ $functions = array(
           'description' => 'Unfreezes an entire category',
           'type'        => 'write',
         ),
+        'warwick_remove_suspended_enrolments' => array(
+          'classname'   => 'local_warwickws_external',
+          'methodname'  => 'remove_suspended_enrolments',
+          'classpath'   => 'local/warwickws/externallib.php',
+          'description' => 'Removes suspended enrolments',
+          'type'        => 'write',
+        ),
 
 );
 
