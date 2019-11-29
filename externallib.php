@@ -1300,4 +1300,80 @@ class local_warwickws_external extends external_api {
       return $n;
     }
 
+
+    // Suspended enrolments
+    public static function remove_suspended_enrolments_parameters() {
+      return new external_function_parameters(
+        array(
+          'courseid' => new external_value(PARAM_INT, 'Course ID', VALUE_REQUIRED),
+          'userid' => new external_value(PARAM_INT, 'User ID', VALUE_DEFAULT, 0),
+          'enrolname' => new external_value(PARAM_TEXT, 'Enrolment method name', VALUE_DEFAULT, 'databaseextended')
+        )
+      );
+    }
+
+    public static function remove_suspended_enrolments_returns() {
+      return new external_single_structure(
+        array(
+          'unenrolments' => new external_value(PARAM_INT, 'Number of unenrolments')
+        )
+      );
+    }
+
+    public static function remove_suspended_enrolments($courseid, $userid, $enrolname) {
+      global $DB;
+
+      $n = new stdClass();
+      $n->unenrolments = 0;
+
+      // Parameter validation - check courseid
+      $params = self::validate_parameters(self::remove_suspended_enrolments_parameters(),
+        array('courseid' => $courseid, 'userid' => $userid, 'enrolname' => $enrolname));
+
+      // Which context are we going to freeze?
+      $course = get_course($params['courseid']);
+      $context = context_course::instance($course->id);
+
+      // Is extendedenrolment plugin in this course?  Get instance
+      $enrol = enrol_get_plugin($params['enrolname']);
+
+      // Get enrolment instances for this course, and select the manual enrolment...
+      $instance = FALSE;
+      $enrolinstances = enrol_get_instances($course->id, true);
+
+      foreach ($enrolinstances as $courseenrolinstance) {
+        if ($courseenrolinstance->enrol == $params['enrolname']) {
+          $instance = $courseenrolinstance;
+          break;
+        }
+      }
+
+      // Delete all entries from user_enrolments and role_assignments
+      if($instance) {
+
+        // Get all suspended users
+        if($params['userid'] != 0) {
+          // Specific user
+          $users = array();
+          $users[] = core_user::get_user($params['userid']);
+
+        } else {
+          // All users
+          $users = get_enrolled_users($context, '', 0, 'u.*', null, 0, 0, false);
+        }
+
+        // Loop through them...
+        foreach($users as $u) {
+          // If a user_enrolment entry exists for this user and instance, that is also suspended...
+          if ($DB->record_exists('user_enrolments', array('enrolid'=>$instance->id, 'userid'=>$u->id, 'status'=>ENROL_USER_SUSPENDED))) {
+            // ...then unenrol them...
+            $enrol->unenrol_user($instance, $u->id);
+            $n->unenrolments++;
+          }
+        }
+      }
+
+      return $n;
+    }
+
 }
