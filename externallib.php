@@ -1480,4 +1480,64 @@ class local_warwickws_external extends external_api {
 
         return $assignments;
     }
+
+    /** Query quizzes */
+
+    public static function query_quizzes_parameters() {
+       return new external_function_parameters(
+           array(
+               'timeopen' => new external_value(PARAM_INT, 'Time that quiz opens', VALUE_REQUIRED),
+               'timeclose' => new external_value(PARAM_INT, 'Time that quiz closes', VALUE_REQUIRED),
+           )
+       );
+    }
+
+    public static function query_quizzes_returns() {
+        return new external_multiple_structure(
+            new external_single_structure(
+                array(
+                    'id' => new external_value(PARAM_INT, 'Assignment ID'),
+                    'course' => new external_value(PARAM_INT, 'Course ID'),
+                    'name' => new external_value(PARAM_TEXT, 'Assignment name'),
+                    'timeopen' => new external_value(PARAM_INT, 'Quiz time open'),
+                    'timeclose' => new external_value(PARAM_INT, 'Quiz time close'),
+                    'timelimit' => new external_value(PARAM_INT, 'Time limit'),
+                    'overduehandling' => new external_value(PARAM_TEXT, 'Overdue handling'),
+                    'graceperiod' => new external_value(PARAM_INT, 'Grace period'),
+                    'timemodified' => new external_value(PARAM_INT, 'Time modified'),
+                )
+            )
+        );
+    }
+
+    public static function query_quizzes($timeopen, $timeclose) {
+       global $DB;
+
+       //Parameter validation
+       $params = self::validate_parameters(self::query_quizzes_parameters(),
+           array('timeopen' => $timeopen, 'timeclose' => $timeclose));
+
+       // Get records and process
+       $quizzes = array();
+       $rs = $DB->get_recordset_sql('SELECT * FROM {quiz} WHERE timeopen >= :timeopen AND timeclose <= :timeclose;', $params);
+
+       // Build return data structure
+       foreach($rs as $quiz) {
+          $g = new stdClass();
+          $g->id = $quiz->id;
+          $g->name = $quiz->name;
+          $g->course = $quiz->course;
+          $g->timeopen = $quiz->timeopen;
+          $g->timeclose = $quiz->timeclose;
+          $g->timelimit = $quiz->timelimit;
+          $g->overduehandling = $quiz->overduehandling;
+          $g->graceperiod = $quiz->graceperiod;
+          $g->timemodified = $quiz->timemodified;
+
+          $quizzes[] = $g;
+       }
+
+       return $quizzes;
+    }
 }
+
