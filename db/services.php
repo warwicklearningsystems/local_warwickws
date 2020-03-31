@@ -150,6 +150,12 @@ $functions = array(
           'description' => 'Removes suspended enrolments',
           'type'        => 'write',
         ),
-
+        'warwick_query_assignments' => array(
+                'classname'   => 'local_warwickws_external',
+                'methodname'  => 'query_assignments',
+                'classpath'   => 'local/warwickws/externallib.php',
+                'description' => 'Identifies assignments with upcoming duedate',
+                'type'        => 'read',
+        ),
 );
 

@@ -1426,4 +1426,58 @@ class local_warwickws_external extends external_api {
       return $n;
     }
 
+    /** Query assignments */
+
+    public static function query_assignments_parameters() {
+       return new external_function_parameters(
+           array(
+               'from' => new external_value(PARAM_INT, 'From date', VALUE_REQUIRED),
+               'duedate' => new external_value(PARAM_INT, 'Due date', VALUE_REQUIRED)
+           )
+       );
+    }
+
+    public static function query_assignments_returns() {
+        return new external_multiple_structure(
+            new external_single_structure(
+                array(
+                    'id' => new external_value(PARAM_INT, 'Assignment ID'),
+                    'course' => new external_value(PARAM_INT, 'Course ID'),
+                    'name' => new external_value(PARAM_TEXT, 'Assignment name'),
+                    'duedate' => new external_value(PARAM_INT, 'Due date'),
+                    'allowsubmissionsfromdate' => new external_value(PARAM_INT, 'Allow submission from date'),
+                    'cutoffdate' => new external_value(PARAM_INT, 'Cut off date'),
+                    'nosubmissions' => new external_value(PARAM_INT, 'Number of submissions'),
+                )
+            )
+        );
+    }
+
+    public static function query_assignments($from, $duedate) {
+        global $DB;
+
+        // Parameter validation
+        $params = self::validate_parameters(self::query_assignments_parameters(),
+           array('from' => $from, 'duedate' => $duedate));
+
+        // Get records and process
+        $assignments = array();
+        $rs = $DB->get_recordset_sql('SELECT * FROM {assign} WHERE duedate <= :duedate AND allowsubmissionsfromdate >= :from;', $params);
+
+        // Build return data structure
+        foreach($rs as $assignment) {
+           $g = new stdClass();
+           $g->id = $assignment->id;
+           $g->name = $assignment->name;
+           $g->course = $assignment->course;
+           $g->duedate = $assignment->duedate;
+           $g->allowsubmissionsfromdate = $assignment->allowsubmissionsfromdate;
+           $g->cutoffdate = $assignment->cutoffdate;
+           $g->nosubmissions = $assignment->nosubmissions;
+
+           $assignments[] = $g;
+        }
+
+        return $assignments;
+    }
 }
