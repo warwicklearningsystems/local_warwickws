@@ -94,6 +94,13 @@ $functions = array(
                 'description' => 'Deletes an instance of a block in a course',
                 'type'        => 'write',
         ),
+        'warwick_course_block_set_html' => array(
+                'classname'   => 'local_warwickws_external',
+                'methodname'  => 'course_block_set_html',
+                'classpath'   => 'local/warwickws/externallib.php',
+                'description' => 'Sets the HTML in an existing HTML block',
+                'type'        => 'write',
+        ),
         'warwick_reset_dashboard' => array(
                 'classname'   => 'local_warwickws_external',
                 'methodname'  => 'reset_user_dashboard',
