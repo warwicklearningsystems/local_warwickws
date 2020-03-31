@@ -996,7 +996,8 @@ class local_warwickws_external extends external_api {
          return new external_function_parameters(
            array(
              'courseid' => new external_value(PARAM_INT, 'Course ID', VALUE_REQUIRED),
-             'blockname' => new external_value(PARAM_TEXT, 'Block name', VALUE_REQUIRED)
+             'blockname' => new external_value(PARAM_TEXT, 'Block name', VALUE_REQUIRED),
+             'weight' => new external_value(PARAM_INT, 'Weight', VALUE_DEFAULT, 1)
            )
          );
     }
@@ -1005,13 +1006,13 @@ class local_warwickws_external extends external_api {
         return new external_value(PARAM_BOOL, 'Success');
     }
 
-    public static function course_add_block($courseid, $blockname) {
+    public static function course_add_block($courseid, $blockname, $weight) {
         //global $PAGE;
 
         //Parameter validation
         //REQUIRED
         $params = self::validate_parameters(self::course_add_block_parameters(),
-            array('courseid' => $courseid, 'blockname' => $blockname));
+            array('courseid' => $courseid, 'blockname' => $blockname, 'weight' => $weight));
 
         // Where are we going to put this block?
         $course = get_course($params['courseid']);
@@ -1021,11 +1022,11 @@ class local_warwickws_external extends external_api {
         $page = new moodle_page();
         $page->set_context($context);
         $page->set_pagelayout("course");
-        
+
         // Add the block
         $defaultregion = $page->blocks->get_default_region();
 
-        $page->blocks->add_block($blockname, $defaultregion, 1, FALSE, 'course-view-*');
+        $page->blocks->add_block($blockname, $defaultregion, $params['weight'], FALSE, 'course-view-*');
    }
 
     /** Remove blocks */
