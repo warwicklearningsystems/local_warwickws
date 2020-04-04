@@ -1153,6 +1153,8 @@ class local_warwickws_external extends external_api {
         $course = get_course($params['courseid']);
         $context = context_course::instance($course->id);
 
+        require_capability('local/warwickws:usewebservices', $context);
+
         // Check the block exists
         $block = $DB->get_record('block_instances', array('parentcontextid' => $context->id, 'id' => $params['blockid']));
 
