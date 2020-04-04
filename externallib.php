@@ -1428,4 +1428,118 @@ class local_warwickws_external extends external_api {
       return $n;
     }
 
+    /** Query assignments */
+
+    public static function query_assignments_parameters() {
+       return new external_function_parameters(
+           array(
+               'from' => new external_value(PARAM_INT, 'From date', VALUE_REQUIRED),
+               'duedate' => new external_value(PARAM_INT, 'Due date', VALUE_REQUIRED)
+           )
+       );
+    }
+
+    public static function query_assignments_returns() {
+        return new external_multiple_structure(
+            new external_single_structure(
+                array(
+                    'id' => new external_value(PARAM_INT, 'Assignment ID'),
+                    'course' => new external_value(PARAM_INT, 'Course ID'),
+                    'name' => new external_value(PARAM_TEXT, 'Assignment name'),
+                    'duedate' => new external_value(PARAM_INT, 'Due date'),
+                    'allowsubmissionsfromdate' => new external_value(PARAM_INT, 'Allow submission from date'),
+                    'cutoffdate' => new external_value(PARAM_INT, 'Cut off date'),
+                    'nosubmissions' => new external_value(PARAM_INT, 'Number of submissions'),
+                )
+            )
+        );
+    }
+
+    public static function query_assignments($from, $duedate) {
+        global $DB;
+
+        // Parameter validation
+        $params = self::validate_parameters(self::query_assignments_parameters(),
+           array('from' => $from, 'duedate' => $duedate));
+
+        // Get records and process
+        $assignments = array();
+        $rs = $DB->get_recordset_sql('SELECT * FROM {assign} WHERE duedate <= :duedate AND allowsubmissionsfromdate >= :from;', $params);
+
+        // Build return data structure
+        foreach($rs as $assignment) {
+           $g = new stdClass();
+           $g->id = $assignment->id;
+           $g->name = $assignment->name;
+           $g->course = $assignment->course;
+           $g->duedate = $assignment->duedate;
+           $g->allowsubmissionsfromdate = $assignment->allowsubmissionsfromdate;
+           $g->cutoffdate = $assignment->cutoffdate;
+           $g->nosubmissions = $assignment->nosubmissions;
+
+           $assignments[] = $g;
+        }
+
+        return $assignments;
+    }
+
+    /** Query quizzes */
+
+    public static function query_quizzes_parameters() {
+       return new external_function_parameters(
+           array(
+               'timeopen' => new external_value(PARAM_INT, 'Time that quiz opens', VALUE_REQUIRED),
+               'timeclose' => new external_value(PARAM_INT, 'Time that quiz closes', VALUE_REQUIRED),
+           )
+       );
+    }
+
+    public static function query_quizzes_returns() {
+        return new external_multiple_structure(
+            new external_single_structure(
+                array(
+                    'id' => new external_value(PARAM_INT, 'Assignment ID'),
+                    'course' => new external_value(PARAM_INT, 'Course ID'),
+                    'name' => new external_value(PARAM_TEXT, 'Assignment name'),
+                    'timeopen' => new external_value(PARAM_INT, 'Quiz time open'),
+                    'timeclose' => new external_value(PARAM_INT, 'Quiz time close'),
+                    'timelimit' => new external_value(PARAM_INT, 'Time limit'),
+                    'overduehandling' => new external_value(PARAM_TEXT, 'Overdue handling'),
+                    'graceperiod' => new external_value(PARAM_INT, 'Grace period'),
+                    'timemodified' => new external_value(PARAM_INT, 'Time modified'),
+                )
+            )
+        );
+    }
+
+    public static function query_quizzes($timeopen, $timeclose) {
+       global $DB;
+
+       //Parameter validation
+       $params = self::validate_parameters(self::query_quizzes_parameters(),
+           array('timeopen' => $timeopen, 'timeclose' => $timeclose));
+
+       // Get records and process
+       $quizzes = array();
+       $rs = $DB->get_recordset_sql('SELECT * FROM {quiz} WHERE timeopen >= :timeopen AND timeclose <= :timeclose;', $params);
+
+       // Build return data structure
+       foreach($rs as $quiz) {
+          $g = new stdClass();
+          $g->id = $quiz->id;
+          $g->name = $quiz->name;
+          $g->course = $quiz->course;
+          $g->timeopen = $quiz->timeopen;
+          $g->timeclose = $quiz->timeclose;
+          $g->timelimit = $quiz->timelimit;
+          $g->overduehandling = $quiz->overduehandling;
+          $g->graceperiod = $quiz->graceperiod;
+          $g->timemodified = $quiz->timemodified;
+
+          $quizzes[] = $g;
+       }
+
+       return $quizzes;
+    }
 }
+
