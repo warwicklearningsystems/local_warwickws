@@ -1488,7 +1488,7 @@ class local_warwickws_external extends external_api {
     public static function query_quizzes_parameters() {
        return new external_function_parameters(
            array(
-               'timeopen' => new external_value(PARAM_INT, 'Time that quiz opens', VALUE_REQUIRED),
+               'timeopen' => new external_value(PARAM_INT, 'Time that quiz opens', VALUE_DEFAULT, 0),
                'timeclose' => new external_value(PARAM_INT, 'Time that quiz closes', VALUE_REQUIRED),
            )
        );
