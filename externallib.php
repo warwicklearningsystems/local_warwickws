@@ -814,21 +814,26 @@ class local_warwickws_external extends external_api {
         return new external_multiple_structure(
             new external_single_structure(
                 array(
+                    'id' => new external_value(PARAM_INT, 'Course ID'),
                     'name' => new external_value(PARAM_TEXT, 'Name of course'),
+                    'shortname' => new external_value(PARAM_TEXT, 'Shortname of course'),
                     'idnumber' => new external_value(PARAM_TEXT, 'ID number of course'),
                     'assignments' => new external_multiple_structure(
                         new external_single_structure(
-                        array(
-                          'id' => new external_value(PARAM_TEXT, 'Assignment ID'),
-                          'name' => new external_value(PARAM_TEXT, 'Name of assignment'),
-                          'duedate' => new external_value(PARAM_TEXT, 'Due date for assignment'),
-                        )
+                          array(
+                            'id' => new external_value(PARAM_INT, 'Assignment ID'),
+                            'cmid' => new external_value(PARAM_INT, 'Course module ID'),
+                            'name' => new external_value(PARAM_TEXT, 'Name of assignment'),
+                            'duedate' => new external_value(PARAM_TEXT, 'Assignment due date'),
+                            'allowsubmissionsfromdate' => new external_value(PARAM_TEXT, 'Allow submissions to assignment from date'),
+                            'cutoffdate' => new external_value(PARAM_TEXT, 'Assignment cut off date'),
+                            'visible' => new external_value(PARAM_INT, 'Visibility'),
+                          )
                         )
                     )
                 )
             )
         );
-
     }
 
     public static function get_student_assignment($idnumber) {
@@ -839,31 +844,27 @@ class local_warwickws_external extends external_api {
         $params = self::validate_parameters(self::get_student_assignment_parameters(),
             array('idnumber' => $idnumber));
 
-        //Context validation
-        //OPTIONAL but in most web service it should present
-        $context = get_context_instance(CONTEXT_USER, $USER->id);
-        self::validate_context($context);
-
-        //Capability checking
-        //OPTIONAL but in most web service it should present
-        //if (!has_capability('moodle/user:viewdetails', $context)) {
-        //    throw new moodle_exception('cannotviewprofile');
-        //}
-
         $assignments = array();
 
-        $fields = 'sortorder,shortname,fullname,timemodified';
-        $courses = enrol_get_users_courses($USER->id, true, $fields);
+        // Find user
+        $user = $DB->get_record('user', array('idnumber' => $params['idnumber']));
 
-        foreach($courses as $id => $course) {
+        if($user) {
+
+          $fields = 'shortname,fullname,idnumber';
+          $courses = enrol_get_users_courses($user->id, true, $fields);
+
+          foreach($courses as $course) {
             $a = new stdClass();
 
             $a->name = $course->fullname;
+            $a->shortname = $course->shortname;
             $a->idnumber = $course->idnumber;
             $a->id = $course->id;
             $a->assignments = self::get_assignments_for_course($course->id);
 
             $assignments[] = $a;
+          }
         }
 
         return $assignments;
@@ -908,6 +909,7 @@ class local_warwickws_external extends external_api {
                     'cmid' => $module->id,
                     'course' => $module->course,
                     'name' => $module->name,
+                    'visible' => $module->visible,
                     'duedate' => $module->duedate,
                     'allowsubmissionsfromdate' => $module->allowsubmissionsfromdate,
                     'grade' => $module->grade,
@@ -945,7 +947,8 @@ class local_warwickws_external extends external_api {
           'summary' => new external_value(PARAM_TEXT, 'Summary of the course'),
           'startdate' => new external_value(PARAM_TEXT, 'Start date'),
           'enddate' => new external_value(PARAM_TEXT, 'End date'),
-
+          'timemodified' => new external_value(PARAM_TEXT, 'Time modified'),
+          'visible' => new external_value(PARAM_TEXT, 'Visibility'),
         )
       )
     );
@@ -960,34 +963,36 @@ class local_warwickws_external extends external_api {
     $params = self::validate_parameters(self::get_list_courses_parameters(),
       array('idnumber' => $idnumber));
 
-    //Context validation
-    //OPTIONAL but in most web service it should present
-    $context = get_context_instance(CONTEXT_USER, $USER->id);
-    self::validate_context($context);
+    $usercourses = array();
 
-    //Capability checking
-    //OPTIONAL but in most web service it should present
-    //if (!has_capability('moodle/user:viewdetails', $context)) {
-    //    throw new moodle_exception('cannotviewprofile');
-    //}
+    // Get user
+    $user = $DB->get_record('user', array('idnumber' => $params['idnumber']));
 
-    $assignments = array();
+    if($user) {
 
-    $fields = 'sortorder,shortname,fullname,timemodified';
-    $courses = enrol_get_users_courses($USER->id, true, $fields);
+      $fields = 'shortname, fullname, shortname, idnumber, summary, timemodified, startdate, enddate, visible';
+      $courses = enrol_get_users_courses($user->id, true, $fields);
 
-    foreach($courses as $id => $course) {
-      $a = new stdClass();
+      // For all courses, construct a response
+      foreach($courses as $course) {
+        $c = new stdClass();
 
-      $a->name = $course->fullname;
-      $a->idnumber = $course->idnumber;
-      $a->id = $course->id;
-      $a->assignments = self::get_assignments_for_course($course->id);
+        $c->id = $course->id;
+        $c->fullname = $course->fullname;
+        $c->shortname = $course->shortname;
+        $c->idnumber = $course->idnumber;
+        $c->summary = $course->summary;
+        $c->startdate = $course->startdate;
+        $c->enddate = $course->enddate;
+        $c->timemodified = $course->timemodified;
+        $c->visible = $course->visible;
 
-      $assignments[] = $a;
+        $usercourses[] = $c;
+      }
+
     }
 
-    return $assignments;
+    return $usercourses;
   }
 
     /** Add blocks */
