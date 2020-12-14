@@ -161,5 +161,12 @@ $functions = array(
             'description' => 'Identifies available quizzes',
             'type'        => 'read',
     ),
+    'warwick_query_user_enrolments' => array(
+            'classname'   => 'local_warwickws_external',
+            'methodname'  => 'query_user_enrolments',
+            'classpath'   => 'local/warwickws/externallib.php',
+            'description' => 'Identifies recent changes to user enrolments in a course',
+            'type'        => 'read',
+    ),
 );
 

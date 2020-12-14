@@ -1546,5 +1546,46 @@ class local_warwickws_external extends external_api {
 
        return $quizzes;
     }
+
+
+    /** Query user enrolments */
+
+    public static function query_user_enrolments_parameters() {
+      return new external_function_parameters(
+        array(
+          'courseid' => new external_value(PARAM_INT, 'Course ID', VALUE_REQUIRED)
+        )
+      );
+    }
+
+    public static function query_user_enrolments_returns() {
+      return new external_value(PARAM_INT, 'Last modified');
+    }
+
+    public static function query_user_enrolments($courseid) {
+      global $DB;
+
+      $lastmodified = 0;
+
+      //Parameter validation
+      $params = self::validate_parameters(self::query_user_enrolments_parameters(),
+        array('courseid' => $courseid));
+
+      // Where are we going to put this block?
+      $course = get_course($params['courseid']);
+
+      // Find the last modified date for user enrolments for this course
+      $instances = $DB->get_records('enrol', array('courseid' => $course->id));
+      foreach ($instances as $instance) {
+        # Get latest lastmodified for this enrol plugin
+        $lm = $DB->get_field('user_enrolments', 'MAX(timemodified)', array('enrolid' => $instance->id));
+        if ($lm > $lastmodified) {
+          $lastmodified = $lm;
+        }
+      }
+
+      return $lastmodified;
+    }
+
 }
 
