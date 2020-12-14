@@ -168,5 +168,12 @@ $functions = array(
             'description' => 'Identifies recent changes to user enrolments in a course',
             'type'        => 'read',
     ),
+    'warwick_query_staff_idnumber' => array(
+            'classname'   => 'local_warwickws_external',
+            'methodname'  => 'query_staff_idnumber',
+            'classpath'   => 'local/warwickws/externallib.php',
+            'description' => 'Identify staff user based on university ID number',
+            'type'        => 'read',
+    ),
 );
 

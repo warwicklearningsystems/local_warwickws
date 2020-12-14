@@ -1587,5 +1587,50 @@ class local_warwickws_external extends external_api {
       return $lastmodified;
     }
 
+    /** Query staff user - comparing ID number to PRS codes */
+
+    public static function query_staff_idnumber_parameters() {
+      return new external_function_parameters(
+        array(
+          'universityid' => new external_value(PARAM_TEXT, 'University ID', VALUE_REQUIRED)
+        )
+      );
+    }
+
+    public static function query_staff_idnumber_returns() {
+      return new external_single_structure(
+        array(
+          'prscode' => new external_value(PARAM_TEXT, 'Staff ID/PRS code'),
+          'userid' => new external_value(PARAM_INT, 'Moodle user ID')
+        )
+      );
+    }
+
+    public static function query_staff_idnumber($universityid) {
+      global $DB;
+
+      $n = new stdClass();
+      $n->prscode = '';
+      $n->userid = 0;
+
+      //Parameter validation
+      $params = self::validate_parameters(self::query_staff_idnumber_parameters(),
+        array('universityid' => $universityid));
+
+      // Can we match this user?
+      $sql = "SELECT id, idnumber FROM {user} WHERE idnumber LIKE :universityid";
+      $params = array('universityid' => '__' . $params['universityid']);
+      $user = $DB->get_record_sql($sql, $params);
+
+      // If we have a matching user
+      if($user) {
+        $n->prscode = $user->idnumber;
+        $n->userid = $user->id;
+      }
+
+      return $n;
+    }
+
+
 }
 
