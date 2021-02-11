@@ -944,7 +944,7 @@ class local_warwickws_external extends external_api {
           'fullname' => new external_value(PARAM_TEXT, 'Full name of course'),
           'shortname' => new external_value(PARAM_TEXT, 'Short name of course'),
           'idnumber' => new external_value(PARAM_TEXT, 'ID number of course'),
-          'summary' => new external_value(PARAM_TEXT, 'Summary of the course'),
+          'summary' => new external_value(PARAM_RAW, 'Summary of the course'),
           'startdate' => new external_value(PARAM_TEXT, 'Start date'),
           'enddate' => new external_value(PARAM_TEXT, 'End date'),
           'timemodified' => new external_value(PARAM_TEXT, 'Time modified'),
