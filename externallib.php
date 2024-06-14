@@ -25,7 +25,7 @@ class local_warwickws_external extends external_api {
       return new external_function_parameters(
         array(
           'courseidnumber' => new external_value(PARAM_RAW, 'The WARWICK COURSE ID to verify completion for'),
-          'timestamp' => new external_value(PARAM_RAW, VALUE_OPTIONAL, 'Optional unix timestamp')
+          'timestamp' => new external_value(PARAM_RAW, 'Optional unix timestamp')
         )
       );
 
