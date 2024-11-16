@@ -20,6 +20,38 @@
  * @copyright  2019 University of Warwick
  */
 
+$services = [
+    'local_warwickws' => [
+        'functions' => [
+            'warwick_timestamp_get_course_completion_status',
+            'warwick_binary_get_course_completion_status',
+            'warwick_unenrol_student',
+            'warwick_enrol_student',
+            'warwick_check_cron_tasks',
+            'warwick_get_student_assignments',
+            'warwick_get_list_courses',
+            'warwick_course_add_block',
+            'warwick_course_list_blocks',
+            'warwick_course_remove_block',
+            'warwick_course_block_set_html',
+            'warwick_reset_dashboard',
+            'warwick_add_enrolment_method',
+            'warwick_freeze_course',
+            'warwick_unfreeze_course',
+            'warwick_freeze_category',
+            'warwick_unfreeze_category',
+            'warwick_remove_suspended_enrolments',
+            'warwick_query_assignments',
+            'warwick_query_quizzes',
+            'warwick_query_user_enrolments',
+            'warwick_query_staff_idnumber'
+        ],
+        'requiredcapability' => '',
+        'enabled' => 1
+    ]
+];
+
+
 $functions = array(
     'warwick_timestamp_get_course_completion_status' => array(
             'classname'   => 'local_warwickws_external',
